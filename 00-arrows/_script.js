@@ -13,7 +13,7 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
     layers: 'sccc'
   })
 
-  ;[svg, ctx0, ctx1, ctx2] = c.layers
+  ;[svg, ctxBot, ctx0, ctx1] = c.layers
   var {width, height} = c
 
   // projection
@@ -38,6 +38,7 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
 
   var path = d3.geoPath().context(ctx0).projection(proj)
   path(topojson.mesh(earth, earth.objects.coastline_50m))
+  ctx0.strokeStyle = "rgba(255,0,0,.4)"
   ctx0.stroke()
 
   // rounded extent
@@ -109,19 +110,20 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
 
 
   svg.appendMany('g', points)
+    .st({opacity: .5})
     .translate(d => proj([d.lng, d.lat]))
     .append('circle')
     .at({
       r: 2,
       fill: 'none',
       strokeWidth: .5,
-      stroke: '#ccc',
+      stroke: '#f0f',
     })
     .parent()
     .append('path')
     .at({
-      d: d => 'M 0 0 L' + [d.u*.5, d.v*.5],
-      stroke: '#000'
+      d: d => 'M 0 0 L' + [d.u*.8, -d.v*.8],
+      stroke: '#f0f'
     })
 
   // ctx1.beginPath()
@@ -134,13 +136,12 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
   // ctx1.stroke()
 
 
-  dots = d3.range(1000).map(d => {
+  dots = d3.range(5000).map(d => {
     var px = Math.random()*width
     var py = Math.random()*height
+    var age = Math.random()*100
 
-    age = Math.random()*100
-
-    return {px, py}
+    return {px, py, age}
   })
 
   if (window.timer) window.timer.stop()
@@ -154,34 +155,37 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
 
       d.age++
       var inBounds = 0 <= d.px && d.px < width && 0 <= d.py && d.py < height
-      if (!v || (v.v == 0 && v.u == 0) || !inBounds || age > 100){
+      if (!v || (v.v == 0 && v.u == 0) || !inBounds || d.age > 100){
         d.px = Math.random()*width
         d.py = Math.random()*height
         d.u = 0 
         d.v = 0
         d.age = 0
       } else {
-        d.v = v.v/5
         d.u = v.u/5
+        d.v = v.v/5
 
-        d.px += d.v 
-        d.py += d.u 
+        d.px += d.u
+        d.py += -d.v
       }
     })
 
-    // ctx2.globalCompositeOperation = "destination-in";
-    ctx2.fillStyle = 'rgba(0, 0, 0, .001)'
-    ctx2.fillRect(0, 0, width, height)
-    ctx2.globalCompositeOperation = 'source-over'
+    ctxBot.globalCompositeOperation = 'destination-in'
+    ctxBot.fillStyle = 'rgba(0, 0, 0, 0.95)'
+    ctxBot.fillRect(0, 0, width, height)
+    ctxBot.globalCompositeOperation = 'source-over'
 
-    ctx2.beginPath()
-    dots.forEach(d => {
-      ctx2.moveTo(d.px, d.py)
-      ctx2.lineTo(d.px + d.u*5, d.py + d.v*5)
-      // console.log(d.px, d.py)
+    var opacityScale = d3.scaleLinear().domain([0, 10]).range([.3, 1])
+    d3.nestBy(dots, d => Math.round(d.u + d.v)).forEach(bucket => {
+      ctxBot.beginPath()
+      bucket.forEach(d => {
+        ctxBot.moveTo(d.px, d.py)
+        ctxBot.lineTo(d.px + d.u, d.py + -d.v)
+      })
+      ctxBot.strokeStyle = `rgba(255,255,255,${opacityScale(bucket.key)})`
+      ctxBot.stroke()
+      
     })
-    ctx2.strokeStyle = '#f0f'
-    ctx2.stroke()
 
   })
 
