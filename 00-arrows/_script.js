@@ -17,20 +17,20 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
 
   ;[svg, ctx0, ctx1] = c.layers
 
-  var extent = [[-83.028,32.2],[-75.59,36.2]]
-  var extent = [[-83.028,32.2],[-75.59,46.2]]
-  var proj = d3.geoTransverseMercator().rotate([-84, 0, -170])
-    .fitSize(
-      [c.width, c.height], 
-      { type: "MultiPoint", coordinates: extent }
-    )    
+  // var extent = [[-83.028,32.2],[-75.59,36.2]]
+  // var extent = [[-83.028,32.2],[-75.59,46.2]]
+  // var proj = d3.geoTransverseMercator().rotate([-84, 0, -170])
+  //   .fitSize(
+  //     [c.width, c.height], 
+  //     { type: "MultiPoint", coordinates: extent }
+  //   )    
 
-  var extent = [[-124.848974, 24.396308],[-63.885444, 49.384358]]
-  var proj = d3.geoAlbers()
-    .fitSize(
-      [c.width, c.height], 
-      { type: "MultiPoint", coordinates: extent }
-    )    
+  // var extent = [[-124.848974, 24.396308],[-63.885444, 49.384358]]
+  // var proj = d3.geoAlbers()
+  //   .fitSize(
+  //     [c.width, c.height], 
+  //     { type: "MultiPoint", coordinates: extent }
+  //   )    
 
   var extent = [[-180, -90],[180, 90]]
   var proj = d3.geoNaturalEarth1()
@@ -48,7 +48,6 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
   // rounded extent
   ;[[x0, y0], [x1, y1]] = extent
     .map((d, i) => d.map(i ? Math.ceil : Math.floor).map(d => i ? d + 1 : d - 1))
-
 
   var nx = x1 - x0
   var ny = y1 - y0
@@ -72,6 +71,28 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
     return {lng, lat, u, v, pos}
   })
 
+  // "nx":360,
+  // "ny":181,
+  // "basicAngle":0,
+  // "lo1":0.0,
+  // "la1":90.0,
+  // "lo2":359.0,
+  // "la2":-90.0,
+
+  var {nx, ny, lo1, la1, lo2, la2} = grib[0].header
+
+  points = grib[0].data.map((u, i) => {
+    var lng = lo1 + (i % nx)
+    var lat = la1 - Math.floor(i / nx)
+
+    var v = grib[1].data[i]
+
+    // lng = lng - 180
+    var pos = proj([lng, lat])
+
+    return {lng, lat, u, v, pos}
+  })
+
   // svg.appendMany('g', points)
   //   .translate(d => proj([d.lng, d.lat]))
   //   .append('circle')
@@ -88,10 +109,10 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
   ctx1.beginPath()
   points.forEach(d => {
     ctx1.moveTo(d.pos[0], d.pos[1])
-    ctx1.lineTo(d.pos[0] + d.u/8, d.pos[1] + d.v/8)
+    ctx1.lineTo(d.pos[0] + d.u/12, d.pos[1] + d.v/12)
   })
   ctx1.strokeStyle = 'rgba(255,0,255,.5)'
-  ctx1.strokeStyle = '#F0F'
+  ctx1.strokeStyle = '#000'
   ctx1.stroke()
 
 
