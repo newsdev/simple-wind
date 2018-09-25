@@ -1,7 +1,8 @@
 body{
   font-family: monaco, Consolas, 'Lucida Console', monospace; 
-  margin: 0px;
+  margin: 0px auto;
   background: #000;
+  max-width: 840px;
 }
 
 .tooltip {
