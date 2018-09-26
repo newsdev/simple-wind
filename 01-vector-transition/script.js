@@ -1,13 +1,17 @@
 console.clear()
 
-var times = '2018091418 2018091500 2018091506 2018091512 2018091518'
+var times = '2018091418 2018091500 2018091506 2018091512 2018091518 2018091600 2018091606 2018091612 2018091618 2018091700 2018091706 2018091712 2018091718'
   .split(' ')
 
 function load(cb){
-  d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
-    [grib, earth] = res
 
-    cb()
+  d3.loadData(
+    'earth.json', 
+    ...times.map(d => `../raw-data/${d}.json`), 
+    (err, res) => {
+      [earth, ...gribs] = res
+
+      cb()
   })
 }
 
@@ -35,28 +39,44 @@ function init(){
   ctx0.strokeStyle = "rgba(255,255,0,.4)"
   ctx0.stroke()
 
-  var s = 10
-  var {grid, points} = makeGrid(width, height, s, proj)
+  var s = 20
+  var t0 = makeGrid(width, height, s, proj, gribs[0])
+  var t1 = makeGrid(width, height, s, proj, gribs[1])
 
-  console.log(points.length)
+  var parsedGribs = gribs.map(d => makeGrid(width, height, s, proj, d))
 
 
+  var pathStr = d => 'M 0 0 L' + [d.u*.8, -d.v*.8]
 
-  var pointsSel = svg.appendMany('g', points)
+  var pointsSel = svg.appendMany('g', t0.points)
     .translate(d => proj([d.lng, d.lat]))
     .append('circle')
     .at({r: 2,fill: 'none',strokeWidth: .5,stroke: '#f0f',})
-    .parent()
-    .append('path')
-    .at({d: d => 'M 0 0 L' + [d.u*.8, -d.v*.8], stroke: '#f0f'})
+    .parent().append('path').at({d: pathStr, stroke: '#f0f'})
 
-  var gridSel = svg.appendMany('g', grid)
+  var gridSel = svg.appendMany('g', t0.grid)
     .translate(d => [d.px, d.py])
     .append('circle')
-    .at({r: 2,fill: 'none',strokeWidth: .3,stroke: '#fff',})
-    .parent()
-    .append('path')
-    .at({d: d => 'M 0 0 L' + [d.u*.8, -d.v*.8], stroke: '#fff'})
+    .at({r: 2,fill: 'none',strokeWidth: .3, stroke: '#fff',})
+    .parent().append('path').at({d: pathStr, stroke: '#fff'})
+
+
+  var frameIndex = 0
+  var frameRate = 500
+  if (window.interval) window.interval.stop()
+  window.interval = d3.interval(step, frameRate)
+
+  step()
+  function step(){
+    var t1 = parsedGribs[frameIndex++ % parsedGribs.length]
+
+    pointsSel.data(t1.points)
+      .transition().ease(d3.easeLinear).duration(frameIndex ? frameRate : 0).at({d: pathStr})
+
+    gridSel.data(t1.grid)
+      .transition().ease(d3.easeLinear).duration(frameIndex ? frameRate : 0).at({d: pathStr})
+  }
+
 }
 
 

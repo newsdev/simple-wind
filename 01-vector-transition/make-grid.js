@@ -1,11 +1,16 @@
-function makeGrid(width, height, s, proj){
+function makeGrid(width, height, s, proj, grib){
   var extent = [[0, height], [width, 0]]
     .map(proj.invert)
     .map(d => { d[0]+= 360; return d })
 
   // rounded extent
-  ;var [[x0, y0], [x1, y1]] = extent
-    .map((d, i) => d.map(i ? Math.ceil : Math.floor).map(d => i ? d + 5 : d - 5))
+  extent[0][0] += -3
+  extent[1][0] += -1
+  extent[0][1] += +2
+  extent[1][1] += +3
+
+  var [[x0, y0], [x1, y1]] = extent
+    .map((d, i) => d.map(i ? Math.ceil : Math.floor))
 
   var nx = x1 - x0
   var ny = y1 - y0
