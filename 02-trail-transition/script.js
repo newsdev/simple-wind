@@ -39,12 +39,12 @@ function init(){
   ctx0.strokeStyle = "rgba(255,255,0,.4)"
   ctx0.stroke()
 
-  var s = 10
+  var s = 40
   var t0 = makeGrid(width, height, s, proj, gribs[0])
   var t1 = makeGrid(width, height, s, proj, gribs[1])
 
   console.time('parse gribs')
-  var parsedGribs = gribs.map(d => makeGrid(width, height, s, proj, d))
+  var frames = gribs.map(d => makeGrid(width, height, s, proj, d))
   console.timeEnd('parse gribs')
 
   var pathStr = d => 'M 0 0 L' + [d.u*.8, -d.v*.8]
@@ -55,14 +55,14 @@ function init(){
   //   .at({r: 2,fill: 'none',strokeWidth: .5,stroke: '#f0f',})
   //   .parent().append('path').at({d: pathStr, stroke: '#f0f'})
 
-  // var gridSel = svg.appendMany('g', t0.grid)
-  //   .translate(d => [d.px, d.py])
-  //   .append('circle')
-  //   .at({r: 2,fill: 'none',strokeWidth: .3, stroke: '#fff',})
-  //   .parent().append('path').at({d: pathStr, stroke: '#fff'})
+  gridSel = svg.appendMany('g', t0.grid)
+    .translate(d => [d.px, d.py])
+    .append('circle')
+    .at({r: 2,fill: 'none',strokeWidth: .3, stroke: '#f0f',})
+    .parent().append('path').at({d: pathStr, stroke: '#f0f'})
 
   var frameIndex = 0
-  // var frameRate = 500
+  var frameRate = 2000
   // if (window.interval) window.interval.stop()
   // window.interval = d3.interval(step, frameRate)
   // step()
@@ -75,9 +75,6 @@ function init(){
   //   gridSel.data(t1.grid)
   //     .transition().ease(d3.easeLinear).duration(frameIndex ? frameRate : 0).at({d: pathStr})
   // }
-
-
-  t0 = parsedGribs[frameIndex]
 
 
   dots = d3.range(5000).map(d => randomDot())
@@ -95,6 +92,30 @@ function init(){
 
   if (window.timer) window.timer.stop()
   window.timer = d3.timer(t => {
+
+    // vector fields to interpolate between
+    var frameIndex = Math.round(t/frameRate) % frames.length
+    var frame0 = frames[frameIndex]
+    var frame1 = frames[(frameIndex + 1) % frames.length]
+
+    // how far we are between 0 and 1
+    var gt = t/frameRate % 1
+    if (frameIndex == frames.length - 1) ft = 0 // no animation on last frame
+    // console.log(frameIndex, gt)
+
+    var gridBetween = frame0.grid.map((d, index) => {
+      var v0 = frame0.grid[index]
+      var v1 = frame1.grid[index]
+
+      return {
+        u: v0.u + gt*(v1.u - v0.u),
+        v: v0.v + gt*(v1.v - v0.v),
+      }
+    })
+
+    gridSel.data(gridBetween).at({d: pathStr, strokeWidth: 1})
+
+
     dots.forEach(d => {
       var px = Math.floor(d.px/s) % gridWidth
       var py = Math.floor(d.py/s)
@@ -103,12 +124,22 @@ function init(){
       //
       //
       // D     C
+      var [A, B, C, D] = [
+        (px + 0) + (py + 0)*gridWidth,
+        (px + 1) + (py + 0)*gridWidth,
+        (px + 1) + (py + 1)*gridWidth,
+        (px + 0) + (py + 1)*gridWidth,
+      ].map(index => {
+        var v0 = frame0.grid[index]
+        var v1 = frame1.grid[index]
 
-      var A = t0.grid[(px + 0) + (py + 0)*gridWidth]
-      var B = t0.grid[(px + 1) + (py + 0)*gridWidth]
-      var C = t0.grid[(px + 1) + (py + 1)*gridWidth]
-      var D = t0.grid[(px + 0) + (py + 1)*gridWidth]
+        if (!v0 || !v1) return null
 
+        return {
+          u: v0.u + gt*(v1.u - v0.u),
+          v: v0.v + gt*(v1.v - v0.v),
+        }
+      })
 
       if (!A || !B || !C || !D || d.age++ > 100) return randomDot(d)
 
@@ -119,7 +150,6 @@ function init(){
       var u = A.u*(1 - tx)*(1 - ty) + B.u*(tx - 0)*(1 - ty) + C.u*(tx - 0)*(ty - 0) + D.u*(1 - tx)*(ty - 0) 
       var v = A.v*(1 - tx)*(1 - ty) + B.v*(tx - 0)*(1 - ty) + C.v*(tx - 0)*(ty - 0) + D.v*(1 - tx)*(ty - 0) 
 
-        
       d.u = u/5
       d.v = v/5
       d.px += d.u
