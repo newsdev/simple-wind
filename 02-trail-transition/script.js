@@ -99,13 +99,29 @@ function init(){
       var px = Math.floor(d.px/s) % gridWidth
       var py = Math.floor(d.py/s)
 
-      var v = t0.grid[px + py*gridWidth]
-      // console.log({px, py, v})
-      // throw 'up'
-      if (!v || d.age++ > 100) return randomDot(d)
+      // A     B
+      //
+      //
+      // D     C
+
+      var A = t0.grid[(px + 0) + (py + 0)*gridWidth]
+      var B = t0.grid[(px + 1) + (py + 0)*gridWidth]
+      var C = t0.grid[(px + 1) + (py + 1)*gridWidth]
+      var D = t0.grid[(px + 0) + (py + 1)*gridWidth]
+
+
+      if (!A || !B || !C || !D || d.age++ > 100) return randomDot(d)
+
+      // https://en.wikipedia.org/wiki/Bilinear_interpolation
+      var tx = d.px/s - px
+      var ty = d.py/s - py
+      
+      var u = A.u*(1 - tx)*(1 - ty) + B.u*(tx - 0)*(1 - ty) + C.u*(tx - 0)*(ty - 0) + D.u*(1 - tx)*(ty - 0) 
+      var v = A.v*(1 - tx)*(1 - ty) + B.v*(tx - 0)*(1 - ty) + C.v*(tx - 0)*(ty - 0) + D.v*(1 - tx)*(ty - 0) 
+
         
-      d.u = v.u/5
-      d.v = v.v/5
+      d.u = u/5
+      d.v = v/5
       d.px += d.u
       d.py += -d.v
       d.mag = Math.sqrt(d.u*d.u + d.v*d.v)
