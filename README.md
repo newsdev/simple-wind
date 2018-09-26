@@ -95,11 +95,6 @@ curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_1p00.pl?file=gfs.t12z.pgrb2
 
 curl "http://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_1p00.pl?file=gfs.t18z.pgrb2.1p00.f000&lev_10_m_above_ground=on&var_UGRD=on&var_VGRD=on&dir=%2Fgfs.2018091918" -o raw-data/gfs.t18z.pgrb2.1p00.f000.2018091918
 ../grib2json/target/grib2json-0.8.0-SNAPSHOT/bin/grib2json -d -n -o raw-data/2018091918.json raw-data/gfs.t18z.pgrb2.1p00.f000.2018091918
-
-
-
-
-
 ```
 
 
@@ -110,4 +105,21 @@ https://earth.nullschool.net/#2018/09/14/1800Z/wind/surface/level/equirectangula
 
 
 https://github.com/dthpham/butterflow
+
+
+
+
+
+TODO
+
+- auto crop data
+- blur colors a little
+- transition vector field
+
+
+
+
+
+
+
 
