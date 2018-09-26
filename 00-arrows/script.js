@@ -85,19 +85,17 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
     return {px, py, lng, lat, u, v}
   })
 
-  dots = d3.range(5000).map(d => makePoint({}))
+  dots = d3.range(5000).map(d => randomDot())
 
-  function makePoint(d){
+  function randomDot(d = {}){
     d.px = Math.random()*width
     d.py = Math.random()*height
-    d.u = 0 
-    d.v = 0
-    d.age = d.age ? d.age - 100 : Math.random()*100
+    d.u = d.v = 0 
+    d.age = d.age ? 0 : Math.random()*100
 
     return d
   }
 
-  var xOffset = 0
   if (window.timer) window.timer.stop()
   window.timer = d3.timer(t => {
     xOffset += 0
@@ -106,7 +104,7 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
       var py = Math.round(d.py)
 
       var v = grid[px + py*width]
-      if (!v || d.age++ > 100) return makePoint(d)
+      if (!v || d.age++ > 100) return randomDot(d)
         
       d.u = v.u/5
       d.v = v.v/5
@@ -130,7 +128,6 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
       ctxBot.strokeStyle = `rgba(255,255,255,${opacityScale(bucket.key)})`
       ctxBot.stroke()
     })
-
   })
 
 

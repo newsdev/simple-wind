@@ -1,4 +1,4 @@
-function makeGrid(width, height, s){
+function makeGrid(width, height, s, proj){
   var extent = [[0, height], [width, 0]]
     .map(proj.invert)
     .map(d => { d[0]+= 360; return d })
@@ -9,7 +9,7 @@ function makeGrid(width, height, s){
 
   var nx = x1 - x0
   var ny = y1 - y0
-  lnglat2uv = {}
+  var lnglat2uv = {}
   var points = d3.range(0, nx*ny).map(i => {
     var lng = x0 + (i % nx)
     var lat = y0 + Math.floor(i/nx)
@@ -25,7 +25,7 @@ function makeGrid(width, height, s){
     return rv
   })
 
-  grid = d3.range(width*height/s/s).map(i => {
+  var grid = d3.range(width*height/s/s).map(i => {
     var px = i*s % width
     var py = Math.floor(i*s / width)*s
 
@@ -57,6 +57,8 @@ function makeGrid(width, height, s){
 
     return {px, py, lng, lat, u, v}
   })
+
+  return {grid, points}
 }
 
 

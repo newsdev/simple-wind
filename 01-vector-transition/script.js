@@ -35,83 +35,29 @@ function init(){
   ctx0.strokeStyle = "rgba(255,255,0,.4)"
   ctx0.stroke()
 
-  var s = 1
-  makeGrid(width, height, s, proj)
+  var s = 10
+  var {grid, points} = makeGrid(width, height, s, proj)
 
-
-  dots = d3.range(5000).map(d => randomDot())
-
-  function randomDot(d = {}){
-    d.px = Math.random()*width
-    d.py = Math.random()*height
-    d.u = d.v = 0 
-    d.age = d.age ? 0 : Math.random()*100
-
-    return d
-  }
-
-  var xOffset = 0
-  if (window.timer) window.timer.stop()
-  window.timer = d3.timer(t => {
-    xOffset += 0
-    dots.forEach(d => {
-      var px = Math.round(d.px + xOffset) % width
-      var py = Math.round(d.py)
-
-      var v = grid[px + py*width]
-      if (!v || d.age++ > 100) return randomDot(d)
-        
-      d.u = v.u/5
-      d.v = v.v/5
-      d.px += d.u
-      d.py += -d.v
-      d.mag = Math.sqrt(d.u*d.u + d.v*d.v)
-    })
-
-    ctxBot.globalCompositeOperation = 'destination-in'
-    ctxBot.fillStyle = 'rgba(0, 0, 0, 0.97)'
-    ctxBot.fillRect(0, 0, width, height)
-    ctxBot.globalCompositeOperation = 'source-over'
-
-    var opacityScale = d3.scaleLinear().domain([0, 10]).range([.15, 1])
-    d3.nestBy(dots, d => Math.round(d.mag)).forEach(bucket => {
-      ctxBot.beginPath()
-      bucket.forEach(d => {
-        ctxBot.moveTo(d.px, d.py)
-        ctxBot.lineTo(d.px + d.u, d.py + -d.v)
-      })
-      ctxBot.strokeStyle = `rgba(255,255,255,${opacityScale(bucket.key)})`
-      ctxBot.stroke()
-    })
-
-  })
+  console.log(points.length)
 
 
 
+  var pointsSel = svg.appendMany('g', points)
+    .translate(d => proj([d.lng, d.lat]))
+    .append('circle')
+    .at({r: 2,fill: 'none',strokeWidth: .5,stroke: '#f0f',})
+    .parent()
+    .append('path')
+    .at({d: d => 'M 0 0 L' + [d.u*.8, -d.v*.8], stroke: '#f0f'})
 
-
-
-
-  // svg.appendMany('g', points)
-  //   .st({opacity: .5})
-  //   .translate(d => proj([d.lng, d.lat]))
-  //   .append('circle')
-  //   .at({
-  //     r: 2,
-  //     fill: 'none',
-  //     strokeWidth: .5,
-  //     stroke: '#f0f',
-  //   })
-  //   .parent()
-  //   .append('path')
-  //   .at({
-  //     d: d => 'M 0 0 L' + [d.u*.8, -d.v*.8],
-  //     stroke: '#f0f'
-  //   })
-
-
+  var gridSel = svg.appendMany('g', grid)
+    .translate(d => [d.px, d.py])
+    .append('circle')
+    .at({r: 2,fill: 'none',strokeWidth: .3,stroke: '#fff',})
+    .parent()
+    .append('path')
+    .at({d: d => 'M 0 0 L' + [d.u*.8, -d.v*.8], stroke: '#fff'})
 }
-
 
 
 init()
