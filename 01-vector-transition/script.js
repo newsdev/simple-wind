@@ -6,7 +6,7 @@ var times = '2018091418 2018091500 2018091506 2018091512 2018091518 2018091600 2
 function load(cb){
 
   d3.loadData(
-    'earth.json', 
+    '../00-arrows/earth.json', 
     ...times.map(d => `../raw-data/${d}.json`), 
     (err, res) => {
       [earth, ...gribs] = res
@@ -39,11 +39,13 @@ function init(){
   ctx0.strokeStyle = "rgba(255,255,0,.4)"
   ctx0.stroke()
 
-  var s = 20
+  var s = 10
   var t0 = makeGrid(width, height, s, proj, gribs[0])
   var t1 = makeGrid(width, height, s, proj, gribs[1])
 
+  console.time('parse gribs')
   var parsedGribs = gribs.map(d => makeGrid(width, height, s, proj, d))
+  console.timeEnd('parse gribs')
 
 
   var pathStr = d => 'M 0 0 L' + [d.u*.8, -d.v*.8]

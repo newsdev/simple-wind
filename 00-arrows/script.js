@@ -98,9 +98,8 @@ d3.loadData(`../raw-data/${times[0]}.json`, 'earth.json', (err, res) => {
 
   if (window.timer) window.timer.stop()
   window.timer = d3.timer(t => {
-    xOffset += 0
     dots.forEach(d => {
-      var px = Math.round(d.px + xOffset) % width
+      var px = Math.round(d.px) % width
       var py = Math.round(d.py)
 
       var v = grid[px + py*width]
