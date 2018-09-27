@@ -1,4 +1,4 @@
-function makeGrid(width, height, s, proj, grib){
+function makeGrid(width, height, s, proj, grib, index){
   var extent = [[0, height], [width, 0]]
     .map(proj.invert)
     .map(d => { d[0]+= 360; return d })
@@ -64,7 +64,7 @@ function makeGrid(width, height, s, proj, grib){
     return {px, py, lng, lat, u, v}
   })
 
-  return {grid, points}
+  return {grid, points, index}
 }
 
 
