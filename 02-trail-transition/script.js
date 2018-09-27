@@ -39,7 +39,7 @@ function init(){
 
   d3.geoPath().context(ctx0).projection(proj)
     (topojson.mesh(earth, earth.objects.coastline_50m))
-  ctx0.strokeStyle = "rgba(255,255,0,.4)"
+  ctx0.strokeStyle = "rgba(255,0,255,.4)"
   ctx0.stroke()
 
   var s = 5
