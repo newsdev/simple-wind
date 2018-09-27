@@ -1,5 +1,7 @@
 console.clear()
 
+var maxAge = 100
+
 var times = '2018091418 2018091500 2018091506 2018091512 2018091518 2018091600 2018091606 2018091612 2018091618 2018091700 2018091706 2018091712 2018091718 2018091800 2018091806 2018091812 2018091818 2018091900 2018091906 2018091912 2018091918'
   .split(' ')
 
@@ -70,7 +72,7 @@ function init(){
     d.px = Math.random()*width
     d.py = Math.random()*height
     d.u = d.v = 0 
-    d.age = d.age ? 0 : Math.random()*100
+    d.age = d.age ? 0 : Math.random()*maxAge
 
     return d
   }
@@ -134,7 +136,7 @@ function init(){
         }
       })
 
-      if (!A || !B || !C || !D || d.age++ > 100) return randomDot(d)
+      if (!A || !B || !C || !D || d.age++ > maxAge) return randomDot(d)
 
       // https://en.wikipedia.org/wiki/Bilinear_interpolation
       var tx = d.px/s - px
@@ -143,22 +145,24 @@ function init(){
       var u = A.u*(1 - tx)*(1 - ty) + B.u*(tx - 0)*(1 - ty) + C.u*(tx - 0)*(ty - 0) + D.u*(1 - tx)*(ty - 0) 
       var v = A.v*(1 - tx)*(1 - ty) + B.v*(tx - 0)*(1 - ty) + C.v*(tx - 0)*(ty - 0) + D.v*(1 - tx)*(ty - 0) 
 
-      d.u = u/5
-      d.v = v/5
+      d.u = u/10
+      d.v = v/10
       d.px += d.u
       d.py += -d.v
       d.mag = Math.sqrt(d.u*d.u + d.v*d.v)
     })
 
     ctxBot.globalCompositeOperation = 'destination-in'
-    ctxBot.fillStyle = isLastFrame ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0.93)'
+    ctxBot.fillStyle = isLastFrame ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0.96)'
     ctxBot.fillRect(0, 0, width, height)
     ctxBot.globalCompositeOperation = 'source-over'
 
     if (isLastFrame) return
 
-    var opacityScale = d3.scaleLinear().domain([0, 10]).range([.15, 1])
-    d3.nestBy(dots, d => Math.round(d.mag)).forEach(bucket => {
+    var opacityFn = d => Math.round(d.mag*(1 - Math.abs(d.age - maxAge/2)/maxAge))
+    var opacityScale = d3.scaleLinear().domain([-1, 3]).range([.15, 1])
+
+    d3.nestBy(dots, opacityFn).forEach(bucket => {
       ctxBot.beginPath()
       bucket.forEach(d => {
         ctxBot.moveTo(d.px, d.py)

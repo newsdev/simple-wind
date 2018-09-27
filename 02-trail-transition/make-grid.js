@@ -9,7 +9,7 @@ function makeGrid(width, height, s, proj, grib, index){
  
   // silly hack to fit on the screen
   x0 += -3
-  x1 += -1
+  x1 += 1
   y0 += +2
   y1 += +3
 
