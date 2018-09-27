@@ -1,5 +1,24 @@
 # simple-wind
 
+## TODO
+
+-[ ] crop data to extent and merge into onfile
+-[x] blur colors a little
+-[x] transition vector field
+-[ ] webgl rewrite https://blog.mapbox.com/how-i-built-a-wind-map-with-webgl-b63022b5537f
+-[ ] sync rotation speed with time 
+-[ ] 
+-[ ] 
+-[ ] 
+-[ ] 
+
+
+Fancier transitions
+
+- https://inspirit.github.io/jsfeat/#opticalflowlk
+- https://github.com/anvaka/oflow
+- https://en.wikipedia.org/wiki/Lucas%E2%80%93Kanade_method
+
 
 ## download data
 
@@ -109,12 +128,6 @@ https://github.com/dthpham/butterflow
 
 
 
-
-TODO
-
-- auto crop data
-- blur colors a little
-- transition vector field
 
 
 
