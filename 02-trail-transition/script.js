@@ -2,8 +2,17 @@ console.clear()
 
 var maxAge = 100
 
-var times = '2018091418 2018091500 2018091506 2018091512 2018091518 2018091600 2018091606 2018091612 2018091618 2018091700 2018091706 2018091712 2018091718 2018091800 2018091806 2018091812 2018091818 2018091900 2018091906 2018091912 2018091918'
+// 2018100700 2018100706 2018100712 2018100718
+var times = `
+2018100800 2018100806 2018100812 2018100818
+2018100900 2018100906 2018100912 2018100918
+2018101000 2018101006
+`
+  .replace(/\n/g, ' ')
+  .trim()
   .split(' ')
+
+console.log(times)
 
 function load(cb){
 
@@ -35,7 +44,7 @@ function init(){
   var timeSel = divSel.append('div')
     .st({right: 10, top: 10, fontSize: 25, color: '#fff', position: 'absolute'})
 
-  var extent = [[360 -83.028,28.2],[360 -75.59,46.2]]
+  var extent = [[360-95.028,19.2],[360 -83.59,34.2]]
   var proj = d3.geoTransverseMercator().rotate([-84, 0, -170])
     .fitSize([c.width, c.height], {type: "MultiPoint", coordinates: extent})    
 
@@ -64,7 +73,7 @@ function init(){
   //   .at({r: 2,fill: 'none',strokeWidth: .3, stroke: '#f0f',})
   //   .parent().append('path').at({d: pathStr, stroke: '#f0f'})
 
-  var frameRate = 3000
+  var frameRate = 4000
 
   dots = d3.range(5000).map(d => randomDot())
 

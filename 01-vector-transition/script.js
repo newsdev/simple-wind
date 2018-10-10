@@ -1,6 +1,13 @@
 console.clear()
 
-var times = '2018091418 2018091500 2018091506 2018091512 2018091518 2018091600 2018091606 2018091612 2018091618 2018091700 2018091706 2018091712 2018091718'
+// 2018100700 2018100706 2018100712 2018100718
+var times = `
+2018100800 2018100806 2018100812 2018100818
+2018100900 2018100906 2018100912 2018100918
+2018101000 2018101006
+`
+  .replace(/\n/g, ' ')
+  .trim()
   .split(' ')
 
 function load(cb){
@@ -30,7 +37,7 @@ function init(){
   ;[svg, ctx0, ctxBot] = c.layers
   var {width, height} = c
 
-  var extent = [[360 -83.028,28.2],[360 -75.59,46.2]]
+  var extent = [[360-95.028,19.2],[360 -83.59,34.2]]
   var proj = d3.geoTransverseMercator().rotate([-84, 0, -170])
     .fitSize([c.width, c.height], {type: "MultiPoint", coordinates: extent})    
 
@@ -64,7 +71,7 @@ function init(){
 
 
   var frameIndex = 0
-  var frameRate = 500
+  var frameRate = 250
   if (window.interval) window.interval.stop()
   window.interval = d3.interval(step, frameRate)
 

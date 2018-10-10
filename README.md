@@ -2,7 +2,7 @@
 
 ## TODO
 
--[ ] auto dl
+-[x] auto dl
 -[ ] crop data to extent and merge into onfile
 -[x] blur colors a little
 -[x] transition vector field
@@ -22,7 +22,7 @@
 -[ ] white bg
 -[ ] make it easy to set new data in
 -[ ] timer bar on the bottom that fills in
--[ ]
+-[ ] cat colors: three colors
 -[ ]
 
 
