@@ -12,6 +12,18 @@
 -[ ] does it move faster over the ocean? how do i get historical?
 -[ ] 
 -[ ] 
+-[ ] are there old wind files somewhere? want to see speed over ocean
+-[ ] null school has three hour timestamps... where are those?
+-[ ] 
+-[ ] 
+
+## Archie
+
+-[ ] white bg
+-[ ] make it easy to set new data in
+-[ ] timer bar on the bottom that fills in
+-[ ]
+-[ ]
 
 
 Fancier transitions
