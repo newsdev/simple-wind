@@ -2,13 +2,14 @@
 
 ## TODO
 
+-[ ] auto dl
 -[ ] crop data to extent and merge into onfile
 -[x] blur colors a little
 -[x] transition vector field
 -[ ] webgl rewrite https://blog.mapbox.com/how-i-built-a-wind-map-with-webgl-b63022b5537f
 -[ ] sync rotation speed with time 
--[ ] 
--[ ] 
+-[ ] where is the 3 hour data?
+-[ ] does it move faster over the ocean? how do i get historical?
 -[ ] 
 -[ ] 
 
