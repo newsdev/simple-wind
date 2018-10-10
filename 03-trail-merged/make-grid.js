@@ -1,36 +1,8 @@
-function makeGrid(width, height, s, proj, grib, index){
-  var extent = [[0, height], [width, 0]]
-    .map(proj.invert)
-    .map(d => { d[0]+= 360; return d })
-
-  // rounded extent
-  var [[x0, y0], [x1, y1]] = extent
-    .map((d, i) => d.map(i ? Math.ceil : Math.floor))
-
-  console.log(JSON.stringify([[x0, y0], [x1, y1]]))
- 
-  // silly hack to fit on the screen
-  x0 += -5
-  x1 += +5
-  y0 += -5
-  y1 += +5
-
-  var nx = x1 - x0
-  var ny = y1 - y0
+function makeGrid(width, height, s, proj, points){
   var lnglat2uv = {} // TODO this is sloopy, fix
-  var points = d3.range(0, nx*ny).map(i => {
-    var lng = x0 + (i % nx)
-    var lat = y0 + Math.floor(i/nx)
-    var index = lng + (90 - lat)*360
 
-    var u = grib[0].data[index]
-    var v = grib[1].data[index]
-
-    var pos = proj([lng, lat])
-    var rv = {lng, lat, u, v, pos}
-
-    lnglat2uv[lng + '' + lat] = rv
-    return rv
+  points.forEach(d => {
+    lnglat2uv[d.lng + '' + d.lat] = d
   })
 
   var grid = d3.range(width*height/s/s).map(i => {
@@ -66,7 +38,7 @@ function makeGrid(width, height, s, proj, grib, index){
     return {px, py, lng, lat, u, v}
   })
 
-  return {grid, points, index}
+  return {grid, points}
 }
 
 

@@ -3,28 +3,24 @@
 ## TODO
 
 -[x] auto dl
--[ ] crop data to extent and merge into onfile
+-[x] crop data to extent and merge into onfile
 -[x] blur colors a little
 -[x] transition vector field
--[ ] webgl rewrite https://blog.mapbox.com/how-i-built-a-wind-map-with-webgl-b63022b5537f
--[ ] sync rotation speed with time 
--[ ] where is the 3 hour data?
--[ ] does it move faster over the ocean? how do i get historical?
--[ ] 
--[ ] 
--[ ] are there old wind files somewhere? want to see speed over ocean
--[ ] null school has three hour timestamps... where are those?
--[ ] 
--[ ] 
+-[x] where is the 3 hour data?
+-[x] does it move faster over the ocean? how do i get historical?
 
 ## Archie
 
 -[ ] white bg
--[ ] make it easy to set new data in
+-[x] make it easy to set new data in
 -[ ] timer bar on the bottom that fills in
 -[ ] cat colors: three colors
--[ ]
 
+## nope
+
+-[ ] make it no lopsided : (
+-[ ] webgl rewrite https://blog.mapbox.com/how-i-built-a-wind-map-with-webgl-b63022b5537f
+-[ ] sync rotation speed with time 
 
 Fancier transitions
 

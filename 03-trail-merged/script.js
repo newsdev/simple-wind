@@ -5,28 +5,10 @@ var maxAge = 100
 
 function load(cb){
 
-  // 2018100700 2018100706 2018100712 2018100718
-// 2018100800 2018100806 2018100812 2018100818
-  times = `
-2018100900 2018100906 2018100912 2018100918
-2018101000 2018101006
-  `
-    .replace(/\n/g, ' ')
-    .trim()
-    .split(' ')
+  d3.loadData('../00-arrows/earth.json', `points.csv`, (err, res) => {
+    [earth, points] = res
 
-  times = _.flatten(times.map(d => [d, d + 'f3']))
-
-  console.log(times)
-
-
-  d3.loadData(
-    '../00-arrows/earth.json', 
-    ...times.map(d => `../raw-data-f/${d}.json`), 
-    (err, res) => {
-      [earth, ...gribs] = res
-
-      cb()
+    cb()
   })
 }
 
@@ -46,7 +28,7 @@ function init(){
   var {width, height} = c
 
   var timeSel = divSel.append('div')
-    .st({right: 10, top: 10, fontSize: 25, color: '#fff', position: 'absolute'})
+    .st({right: 10, top: 10, fontSize: 25, color: '#000', position: 'absolute'})
 
   var extent = [[360-95.028,19.2],[360 -83.59,34.2]]
   var proj = d3.geoTransverseMercator().rotate([-84, 0, -170])
@@ -59,10 +41,13 @@ function init(){
 
   var s = 5
   console.time('parse gribs')
-  frames = gribs.map((d, i) => makeGrid(width, height, s, proj, d, i))
+  frames = d3.nestBy(points, d => d.date).map(d => {
+    var frame = makeGrid(width, height, s, proj, d)
+    frame.date = d3.timeParse('%Y%m%d%H')(d.key)
+
+    return frame
+  })
   console.timeEnd('parse gribs')
-  var timesFormated = times.map(d => d.includes('f3') ? +d.replace('f3', '') + 3 : d)
-  frames.forEach((d, i) => d.date = d3.timeParse('%Y%m%d%H')(timesFormated[i]))
 
   var pathStr = d => 'M 0 0 L' + [d.u*.8, -d.v*.8]
 
@@ -104,25 +89,12 @@ function init(){
 
     // how far we are between 0 and 1
     var gt = t/frameRate % 1
+    var isLastFrame = frameIndex == frames.length - 1
+    if (isLastFrame) gt = 1 // no animation on last frame
 
     var time = d3.interpolate(frame0.date, frame1.date)(gt)
     timeSel.text(d3.timeFormat('%Y-%m-%d %H:%M')(time))
     // timeSel.text([frame0.index, frame1.index, Math.round(gt*1000)/1000])
-
-    var isLastFrame = frameIndex == frames.length - 1
-    if (isLastFrame) ft = 1 // no animation on last frame
-
-    // var gridBetween = frame0.grid.map((d, index) => {
-    //   var v0 = frame0.grid[index]
-    //   var v1 = frame1.grid[index]
-
-    //   return {
-    //     u: v0.u + gt*(v1.u - v0.u),
-    //     v: v0.v + gt*(v1.v - v0.v),
-    //   }
-    // })
-
-    // gridSel.data(gridBetween).at({d: pathStr, strokeWidth: 1})
 
 
     dots.forEach(d => {
@@ -166,14 +138,16 @@ function init(){
       d.mag = Math.sqrt(d.u*d.u + d.v*d.v)
     })
 
+    // if (isLastFrame) return
     ctxBot.globalCompositeOperation = 'destination-in'
     ctxBot.fillStyle = isLastFrame ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0.96)'
+    // ctxBot.fillStyle = 'rgba(0, 0, 0, 0.95)'
     ctxBot.fillRect(0, 0, width, height)
     ctxBot.globalCompositeOperation = 'source-over'
 
-    if (isLastFrame) return
 
     var opacityFn = d => Math.round(d.mag*(1 - Math.abs(d.age - maxAge/2)/maxAge))
+    var opacityFn = d => Math.round(d.mag)
     var opacityScale = d3.scaleLinear().domain([-1, 3]).range([.15, 1])
 
     d3.nestBy(dots, opacityFn).forEach(bucket => {
@@ -182,7 +156,10 @@ function init(){
         ctxBot.moveTo(d.px, d.py)
         ctxBot.lineTo(d.px + d.u, d.py + -d.v)
       })
-      ctxBot.strokeStyle = `rgba(255,255,255,${opacityScale(bucket.key)})`
+
+      // var color = bucket.key < 1 ? '0,0,0' : bucket.key < 2 ? '255,255,0' :'255,0,0'
+      color = '0,0,0'
+      ctxBot.strokeStyle = `rgba(${color},${opacityScale(bucket.key)})`
       ctxBot.stroke()
     })
   })

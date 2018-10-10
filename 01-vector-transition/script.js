@@ -1,8 +1,7 @@
 console.clear()
 
-// 2018100700 2018100706 2018100712 2018100718
-var times = `
-2018100800 2018100806 2018100812 2018100818
+function load(cb){
+times = `
 2018100900 2018100906 2018100912 2018100918
 2018101000 2018101006
 `
@@ -10,11 +9,12 @@ var times = `
   .trim()
   .split(' ')
 
-function load(cb){
+times = _.flatten(times.map(d => [d, d + 'f3']))
+
 
   d3.loadData(
     '../00-arrows/earth.json', 
-    ...times.map(d => `../raw-data/${d}.json`), 
+    ...times.map(d => `../raw-data-f/${d}.json`), 
     (err, res) => {
       [earth, ...gribs] = res
 
@@ -71,7 +71,7 @@ function init(){
 
 
   var frameIndex = 0
-  var frameRate = 250
+  var frameRate = 1000
   if (window.interval) window.interval.stop()
   window.interval = d3.interval(step, frameRate)
 
